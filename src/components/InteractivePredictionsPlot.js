@@ -8,16 +8,13 @@ import {
   FormGroup,
   Label,
   Input,
-  Button,
-  Popover,
-  PopoverHeader,
-  PopoverBody,
 } from 'reactstrap';
 import Plotly from 'plotly.js-dist';
+import ColorPickerPopover from './ColorPickerPopover';
 
 const DEFAULT_COLORS = {
-  negative: '#3498db', // original blue (negative/outcome 0)
-  positive: '#e74c3c', // original red  (positive/outcome 1)
+  negative: '#3498db',
+  positive: '#e74c3c',
 };
 
 const InteractivePredictionsPlot = ({
@@ -32,15 +29,12 @@ const InteractivePredictionsPlot = ({
 }) => {
   const [internalThreshold, setInternalThreshold] = useState(0.5);
   const [baseColors, setBaseColors] = useState({ ...DEFAULT_COLORS });
-  const [colorPopoverOpen, setColorPopoverOpen] = useState(false);
 
   const plotRef = useRef(null);
   const plotDivRef = useRef(null);
 
   const threshold = externalThreshold !== null ? externalThreshold : internalThreshold;
   const setThreshold = externalThreshold !== null ? () => {} : setInternalThreshold;
-
-  const toggleColorPopover = () => setColorPopoverOpen((s) => !s);
 
   const adjustColor = (hex, amt) => {
     let col = (hex || '#000000').replace('#', '');
@@ -229,67 +223,13 @@ const InteractivePredictionsPlot = ({
           <CardHeader className="d-flex align-items-center justify-content-between">
             <h5 className="mb-0 text-secondary">Interactive Predictions</h5>
             <div className="d-flex align-items-center">
-              <Button
+              <ColorPickerPopover
                 id="color-btn"
-                color="outline-secondary"
-                size="sm"
+                baseColors={baseColors}
+                setBaseColors={setBaseColors}
+                resetColors={resetColors}
                 className="me-2 d-flex align-items-center"
-                onClick={toggleColorPopover}
-                aria-haspopup="true"
-                aria-expanded={colorPopoverOpen}
-                title="Customize point & legend colors"
-              >
-                <i className="fas fa-paint-roller me-2" style={{ fontSize: 14 }} />
-                Customize Colors
-              </Button>
-
-              <Popover placement="bottom" target="color-btn" isOpen={colorPopoverOpen} toggle={toggleColorPopover}>
-                <PopoverHeader className="small text-muted">Colors</PopoverHeader>
-                <PopoverBody className="p-2" style={{ minWidth: 260 }}>
-                  <div className="d-flex align-items-center mb-2">
-                    <div style={{ minWidth: 88 }}>
-                      <Label className="mb-1 fw-bold small">Negative (0)</Label>
-                      <div className="d-flex align-items-center">
-                        <input
-                          aria-label="Negative color"
-                          type="color"
-                          value={baseColors.negative}
-                          onChange={(e) => setBaseColors((c) => ({ ...c, negative: e.target.value }))}
-                          style={{ width: 36, height: 30, border: 'none', padding: 0 }}
-                        />
-                        <code className="ms-2 small" style={{ fontSize: 12 }}>{baseColors.negative}</code>
-                      </div>
-                    </div>
-
-                    <div style={{ minWidth: 88 }} className="ms-3">
-                      <Label className="mb-1 fw-bold small">Positive (1)</Label>
-                      <div className="d-flex align-items-center">
-                        <input
-                          aria-label="Positive color"
-                          type="color"
-                          value={baseColors.positive}
-                          onChange={(e) => setBaseColors((c) => ({ ...c, positive: e.target.value }))}
-                          style={{ width: 36, height: 30, border: 'none', padding: 0 }}
-                        />
-                        <code className="ms-2 small" style={{ fontSize: 12 }}>{baseColors.positive}</code>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="d-flex align-items-center justify-content-between mb-2">
-                    <div className="small text-muted">Preview</div>
-                    <div className="d-flex align-items-center">
-                      <div style={{ width: 16, height: 16, background: baseColors.negative, borderRadius: 4, border: '1px solid rgba(0,0,0,0.06)' }} />
-                      <div style={{ width: 16, height: 16, background: baseColors.positive, borderRadius: 4, border: '1px solid rgba(0,0,0,0.06)', marginLeft: 8 }} />
-                    </div>
-                  </div>
-
-                  <div className="d-flex gap-2 mt-1">
-                    <Button color="secondary" size="sm" onClick={resetColors} className="flex-grow-1">Reset</Button>
-                    <Button color="primary" size="sm" onClick={toggleColorPopover} className="flex-grow-1">Done</Button>
-                  </div>
-                </PopoverBody>
-              </Popover>
+              />
             </div>
           </CardHeader>
 
@@ -329,57 +269,12 @@ const InteractivePredictionsPlot = ({
       ) : (
         <div>
           <div className="d-flex justify-content-end mb-2">
-            <Button id="color-btn-embed" color="outline-secondary" size="sm" className="me-2" onClick={toggleColorPopover}>
-              Customize Colors
-            </Button>
-
-            <Popover placement="bottom" target="color-btn-embed" isOpen={colorPopoverOpen} toggle={toggleColorPopover}>
-              <PopoverHeader className="small text-muted">Colors</PopoverHeader>
-              <PopoverBody className="p-2" style={{ minWidth: 260 }}>
-                <div className="d-flex align-items-center mb-2">
-                  <div style={{ minWidth: 88 }}>
-                    <Label className="mb-1 fw-bold small">Negative (0)</Label>
-                    <div className="d-flex align-items-center">
-                      <input
-                        aria-label="Negative color"
-                        type="color"
-                        value={baseColors.negative}
-                        onChange={(e) => setBaseColors((c) => ({ ...c, negative: e.target.value }))}
-                        style={{ width: 36, height: 30, border: 'none', padding: 0 }}
-                      />
-                      <code className="ms-2 small" style={{ fontSize: 12 }}>{baseColors.negative}</code>
-                    </div>
-                  </div>
-
-                  <div style={{ minWidth: 88 }} className="ms-3">
-                    <Label className="mb-1 fw-bold small">Positive (1)</Label>
-                    <div className="d-flex align-items-center">
-                      <input
-                        aria-label="Positive color"
-                        type="color"
-                        value={baseColors.positive}
-                        onChange={(e) => setBaseColors((c) => ({ ...c, positive: e.target.value }))}
-                        style={{ width: 36, height: 30, border: 'none', padding: 0 }}
-                      />
-                      <code className="ms-2 small" style={{ fontSize: 12 }}>{baseColors.positive}</code>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-center justify-content-between mb-2">
-                  <div className="small text-muted">Preview</div>
-                  <div className="d-flex align-items-center">
-                    <div style={{ width: 16, height: 16, background: baseColors.negative, borderRadius: 4, border: '1px solid rgba(0,0,0,0.06)' }} />
-                    <div style={{ width: 16, height: 16, background: baseColors.positive, borderRadius: 4, border: '1px solid rgba(0,0,0,0.06)', marginLeft: 8 }} />
-                  </div>
-                </div>
-
-                <div className="d-flex gap-2 mt-1">
-                  <Button color="secondary" size="sm" onClick={resetColors} className="flex-grow-1">Reset</Button>
-                  <Button color="primary" size="sm" onClick={toggleColorPopover} className="flex-grow-1">Done</Button>
-                </div>
-              </PopoverBody>
-            </Popover>
+            <ColorPickerPopover
+              id="color-btn-embed"
+              baseColors={baseColors}
+              setBaseColors={setBaseColors}
+              resetColors={resetColors}
+            />
           </div>
 
           <div
